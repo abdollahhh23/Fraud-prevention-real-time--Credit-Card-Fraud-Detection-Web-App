@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Risk Monitor v2.0</title>
+<title>FraudShield Risk Monitor</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
@@ -17,11 +17,12 @@
   --bg4:       #1f1f1f;
   --border:    #2a2a2a;
   --border2:   #333333;
-  --dim:       #444444;
-  --muted:     #666666;
-  --sub:       #888888;
-  --base:      #aaaaaa;
-  --bright:    #cccccc;
+  --dim:       #666666;
+  --muted:     #888888;
+  /* Hard white updates for maximum readability */
+  --sub:       #ffffff; 
+  --base:      #ffffff;
+  --bright:    #ffffff;
   --white:     #ffffff;
   --blue:      #3b82f6;
   --blue-dim:  rgba(59,130,246,.12);
@@ -55,10 +56,10 @@ body{background:var(--bg);color:var(--base);font-family:var(--sans);font-size:13
 .logo-name{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--white);letter-spacing:.5px}
 .logo-ver{font-family:var(--mono);font-size:10px;color:var(--dim);background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:1px 6px}
 .topbar-right{display:flex;align-items:center;gap:12px}
-.status-dot{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--sub)}
+.status-dot{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--white)}
 .status-dot .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2.5s ease infinite;box-shadow:0 0 6px var(--green)}
 @keyframes blink{0%,100%{opacity:1}60%{opacity:.3}}
-.badge{font-family:var(--mono);font-size:11px;background:var(--bg2);border:1px solid var(--border);color:var(--sub);border-radius:3px;padding:2px 8px}
+.badge{font-family:var(--mono);font-size:11px;background:var(--bg2);border:1px solid var(--border);color:var(--white);border-radius:3px;padding:2px 8px}
 .acc{font-family:var(--mono);font-size:11px;color:var(--green)}
 
 /* ── LAYOUT ── */
@@ -80,7 +81,7 @@ body{background:var(--bg);color:var(--base);font-family:var(--sans);font-size:13
 .toggle-row{display:flex;gap:5px}
 .tbtn{flex:1;height:32px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--muted);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s}
 .tbtn.on{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 0 14px var(--blue-glow)}
-.tbtn:hover:not(.on){border-color:var(--blue);color:var(--bright)}
+.tbtn:hover:not(.on){border-color:var(--blue);color:var(--white)}
 .run-btn{width:100%;height:40px;border-radius:6px;background:var(--blue);border:none;color:#fff;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.3px;transition:all .15s;box-shadow:0 0 20px var(--blue-glow)}
 .run-btn:hover{background:#2563eb;box-shadow:0 0 28px var(--blue-glow)}
 .run-btn:active{transform:scale(.98)}
@@ -106,15 +107,15 @@ body{background:var(--bg);color:var(--base);font-family:var(--sans);font-size:13
 .b-title{font-family:var(--mono);font-size:14px;font-weight:600;line-height:1}
 .cleared .b-title{color:var(--green)}
 .flagged .b-title{color:var(--red)}
-.idle .b-title{color:var(--sub)}
-.b-sub{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:3px;letter-spacing:.3px}
+.idle .b-title{color:var(--white)}
+.b-sub{font-family:var(--mono);font-size:10px;color:var(--white);margin-top:3px;letter-spacing:.3px}
 .b-right{text-align:right}
 .b-pct{font-family:var(--mono);font-size:30px;font-weight:700;line-height:1}
 .cleared .b-pct{color:var(--green)}
 .flagged .b-pct{color:var(--red)}
 .idle .b-pct{color:var(--dim)}
 .b-pct-lbl{font-family:var(--mono);font-size:9px;letter-spacing:1.4px;color:var(--dim);text-transform:uppercase}
-.b-ci{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px}
+.b-ci{font-family:var(--mono);font-size:10px;color:var(--white);margin-top:2px}
 
 /* ── TIER BADGE ── */
 .tier{display:inline-block;padding:2px 8px;border-radius:3px;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:1px;margin-top:4px}
@@ -136,8 +137,8 @@ body{background:var(--bg);color:var(--base);font-family:var(--sans);font-size:13
 .rf{margin-bottom:10px}
 .rf:last-child{margin-bottom:0}
 .rf-hd{display:flex;justify-content:space-between;margin-bottom:4px}
-.rf-name{font-family:var(--sans);font-size:12px;color:var(--sub)}
-.rf-score{font-family:var(--mono);font-size:11px;color:var(--bright)}
+.rf-name{font-family:var(--sans);font-size:12px;color:var(--white)}
+.rf-score{font-family:var(--mono);font-size:11px;color:var(--white)}
 .rf-bg{height:3px;background:var(--bg3);border-radius:2px;overflow:hidden}
 .rf-fill{height:100%;border-radius:2px;transition:width .7s cubic-bezier(.4,0,.2,1)}
 
@@ -145,15 +146,15 @@ body{background:var(--bg);color:var(--base);font-family:var(--sans);font-size:13
 .gauge-wrap{display:flex;flex-direction:column;align-items:center;padding:6px 0 0}
 
 /* ── RADAR ── */
-.radar-wrap{display:flex;align-items:center;justify-content:center;min-height:155px}
+.radar-wrap{display:flex;align-items:center;justify-content:center;min-height:175px}
 
 /* ── RECENT CHECKS ── */
 .tbl{width:100%;border-collapse:collapse}
 .tbl thead th{font-family:var(--mono);font-size:9px;letter-spacing:1.3px;color:var(--dim);text-transform:uppercase;padding:0 6px 8px;text-align:left;border-bottom:1px solid var(--border)}
 .tbl tbody tr{border-bottom:1px solid rgba(42,42,42,.5);transition:background .12s}
 .tbl tbody tr:hover{background:var(--bg2)}
-.tbl tbody td{padding:7px 6px;font-family:var(--mono);font-size:11px;color:var(--muted)}
-.tbl td.amt{color:var(--bright)}
+.tbl tbody td{padding:7px 6px;font-family:var(--mono);font-size:11px;color:var(--white)}
+.tbl td.amt{color:var(--white)}
 .rbadge{display:inline-block;padding:2px 7px;border-radius:3px;font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.8px}
 .rbadge.c{background:var(--green-dim);color:var(--green);border:1px solid rgba(16,185,129,.25)}
 .rbadge.f{background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,.25)}
@@ -162,7 +163,7 @@ td.pf{color:var(--red);font-family:var(--mono);font-size:11px}
 
 /* ── INDICATORS ── */
 .ind-list{display:flex;flex-direction:column;gap:7px}
-.ind-item{display:flex;align-items:center;gap:8px;font-family:var(--sans);font-size:12px;color:var(--sub)}
+.ind-item{display:flex;align-items:center;gap:8px;font-family:var(--sans);font-size:12px;color:var(--white)}
 .ind-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);box-shadow:0 0 5px var(--orange);flex-shrink:0}
 
 /* ── HISTORY CHART ── */
@@ -173,25 +174,23 @@ td.pf{color:var(--red);font-family:var(--mono);font-size:11px}
 
 /* ── HEAT MATRIX ── */
 .heat-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:4px}
-.heat-cell{height:28px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;color:var(--sub);transition:all .3s;cursor:default}
+.heat-cell{height:28px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;color:var(--white);transition:all .3s;cursor:default}
 .heat-lbl-row{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px}
 .heat-lbl{font-family:var(--mono);font-size:8px;color:var(--dim);text-align:center;letter-spacing:.5px}
 
 /* ── VELOCITY PANEL ── */
 .vel-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
 .vel-item:last-child{border-bottom:none}
-.vel-lbl{font-family:var(--sans);font-size:12px;color:var(--sub);flex:1}
+.vel-lbl{font-family:var(--sans);font-size:12px;color:var(--white);flex:1}
 .vel-bar-bg{flex:2;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
 .vel-bar-fill{height:100%;border-radius:2px;transition:width .6s ease}
-.vel-val{font-family:var(--mono);font-size:11px;color:var(--bright);width:36px;text-align:right}
+.vel-val{font-family:var(--mono);font-size:11px;color:var(--white);width:36px;text-align:right}
 
 /* ── MINI STAT CARDS ── */
 .mini-stat{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
 .ms-val{font-family:var(--mono);font-size:18px;font-weight:600;color:var(--white);line-height:1}
 .ms-lbl{font-family:var(--mono);font-size:9px;letter-spacing:1.2px;color:var(--dim);text-transform:uppercase}
 .ms-delta{font-family:var(--mono);font-size:10px;margin-top:2px}
-.ms-delta.up{color:var(--red)}
-.ms-delta.dn{color:var(--green)}
 
 /* ── CONFIDENCE BAR ── */
 .conf-track{height:6px;background:var(--bg3);border-radius:3px;position:relative;overflow:visible;margin:10px 0 4px}
@@ -206,7 +205,6 @@ td.pf{color:var(--red);font-family:var(--mono);font-size:11px}
 </head>
 <body>
 
-<!-- TOPBAR -->
 <header class="topbar">
   <div class="logo">
     <div class="logo-icon">RM</div>
@@ -222,7 +220,6 @@ td.pf{color:var(--red);font-family:var(--mono);font-size:11px}
 
 <div class="layout">
 
-<!-- SIDEBAR -->
 <aside class="sidebar">
   <div>
     <div class="sec-lbl">Transaction Details</div>
@@ -282,29 +279,27 @@ td.pf{color:var(--red);font-family:var(--mono);font-size:11px}
     <div class="sec-lbl">Session Metrics</div>
     <div style="display:flex;flex-direction:column;gap:6px">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)">
-        <span style="font-family:var(--mono);font-size:11px;color:var(--sub)">Avg Fraud Prob</span>
-        <span style="font-family:var(--mono);font-size:12px;color:var(--bright)" id="avgProb">—</span>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--white)">Avg Fraud Prob</span>
+        <span style="font-family:var(--mono);font-size:12px;color:var(--white)" id="avgProb">—</span>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)">
-        <span style="font-family:var(--mono);font-size:11px;color:var(--sub)">Flag Rate</span>
-        <span style="font-family:var(--mono);font-size:12px;color:var(--bright)" id="flagRate">—</span>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--white)">Flag Rate</span>
+        <span style="font-family:var(--mono);font-size:12px;color:var(--white)" id="flagRate">—</span>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)">
-        <span style="font-family:var(--mono);font-size:11px;color:var(--sub)">Max Prob Seen</span>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--white)">Max Prob Seen</span>
         <span style="font-family:var(--mono);font-size:12px;color:var(--red)" id="maxProb">—</span>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0">
-        <span style="font-family:var(--mono);font-size:11px;color:var(--sub)">Min Prob Seen</span>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--white)">Min Prob Seen</span>
         <span style="font-family:var(--mono);font-size:12px;color:var(--green)" id="minProb">—</span>
       </div>
     </div>
   </div>
 </aside>
 
-<!-- MAIN -->
 <main class="main">
 
-  <!-- STATUS BANNER -->
   <div class="banner idle fade-in" id="banner">
     <div class="b-left">
       <div class="b-icon" id="bIcon">—</div>
@@ -321,9 +316,7 @@ td.pf{color:var(--red);font-family:var(--mono);font-size:11px}
     </div>
   </div>
 
-  <!-- ROW 1 -->
   <div class="g2">
-    <!-- Risk Factor Breakdown -->
     <div class="card">
       <div class="c-title">Risk Factor Breakdown</div>
       <div class="rf">
@@ -343,7 +336,6 @@ td.pf{color:var(--red);font-family:var(--mono);font-size:11px}
         <div class="rf-bg"><div class="rf-fill" id="rfTimeB" style="width:0%;background:var(--cyan)"></div></div>
       </div>
 
-      <!-- Confidence interval bar -->
       <div style="margin-top:18px">
         <div style="font-family:var(--mono);font-size:9px;letter-spacing:1.4px;color:var(--dim);text-transform:uppercase;margin-bottom:2px">Model Confidence Interval</div>
         <div class="conf-track" id="confTrack">
@@ -354,9 +346,7 @@ td.pf{color:var(--red);font-family:var(--mono);font-size:11px}
       </div>
     </div>
 
-    <!-- Gauge + Radar split -->
     <div style="display:flex;flex-direction:column;gap:12px">
-      <!-- Gauge -->
       <div class="card" style="flex:1">
         <div class="c-title">Fraud Probability</div>
         <div class="gauge-wrap">
@@ -368,15 +358,13 @@ td.pf{color:var(--red);font-family:var(--mono);font-size:11px}
           </svg>
         </div>
       </div>
-      <!-- Risk Profile Radar -->
       <div class="card" style="flex:1">
-        <div class="c-title">Risk Profile</div>
-        <div class="radar-wrap"><svg id="radar" width="190" height="150" viewBox="0 0 190 150"></svg></div>
+        <div class="c-title">Risk Profile Matrix</div>
+        <div class="radar-wrap"><svg id="radar" width="240" height="180" viewBox="0 0 240 180" style="overflow:visible"></svg></div>
       </div>
     </div>
   </div>
 
-  <!-- ROW 2 — History sparkline + Session distribution -->
   <div class="g2">
     <div class="card">
       <div class="c-title">Fraud Probability — Check History</div>
@@ -400,14 +388,12 @@ td.pf{color:var(--red);font-family:var(--mono);font-size:11px}
     </div>
   </div>
 
-  <!-- ROW 3 — Recent Checks + Indicators -->
   <div class="g13">
     <div class="card">
       <div class="c-title">Indicators Detected</div>
       <div class="ind-list" id="indList">
         <div class="ind-item"><span class="ind-dot" style="background:var(--dim);box-shadow:none"></span><span style="color:var(--dim)">No check run yet</span></div>
       </div>
-      <!-- Risk velocity -->
       <div style="margin-top:16px">
         <div class="c-title" style="margin-bottom:8px">Risk Component Velocity</div>
         <div id="velPanel">
@@ -427,7 +413,6 @@ td.pf{color:var(--red);font-family:var(--mono);font-size:11px}
     </div>
   </div>
 
-  <!-- ROW 4 — Merchant heat map + Mini stats -->
   <div class="g2">
     <div class="card">
       <div class="c-title">Merchant Risk Heat Map (Day vs Night)</div>
@@ -471,24 +456,23 @@ td.pf{color:var(--red);font-family:var(--mono);font-size:11px}
         </div>
       </div>
 
-      <!-- Score band breakdown pie-ish bar -->
       <div style="margin-top:14px">
         <div class="c-title" style="margin-bottom:8px">Score Band Distribution</div>
         <div style="display:flex;flex-direction:column;gap:6px" id="bandBars">
           <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-family:var(--mono);font-size:10px;color:var(--green)">Low (0–20%)</span><span style="font-family:var(--mono);font-size:10px;color:var(--sub)" id="bandLowN">0</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-family:var(--mono);font-size:10px;color:var(--green)">Low (0–20%)</span><span style="font-family:var(--mono);font-size:10px;color:var(--white)" id="bandLowN">0</span></div>
             <div style="height:5px;background:var(--bg3);border-radius:3px;overflow:hidden"><div id="bandLowB" style="height:100%;background:var(--green);border-radius:3px;width:0%;transition:width .6s"></div></div>
           </div>
           <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-family:var(--mono);font-size:10px;color:var(--yellow)">Medium (20–50%)</span><span style="font-family:var(--mono);font-size:10px;color:var(--sub)" id="bandMedN">0</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-family:var(--mono);font-size:10px;color:var(--yellow)">Medium (20–50%)</span><span style="font-family:var(--mono);font-size:10px;color:var(--white)" id="bandMedN">0</span></div>
             <div style="height:5px;background:var(--bg3);border-radius:3px;overflow:hidden"><div id="bandMedB" style="height:100%;background:var(--yellow);border-radius:3px;width:0%;transition:width .6s"></div></div>
           </div>
           <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-family:var(--mono);font-size:10px;color:var(--orange)">High (50–75%)</span><span style="font-family:var(--mono);font-size:10px;color:var(--sub)" id="bandHighN">0</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-family:var(--mono);font-size:10px;color:var(--orange)">High (50–75%)</span><span style="font-family:var(--mono);font-size:10px;color:var(--white)" id="bandHighN">0</span></div>
             <div style="height:5px;background:var(--bg3);border-radius:3px;overflow:hidden"><div id="bandHighB" style="height:100%;background:var(--orange);border-radius:3px;width:0%;transition:width .6s"></div></div>
           </div>
           <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-family:var(--mono);font-size:10px;color:var(--red)">Critical (75%+)</span><span style="font-family:var(--mono);font-size:10px;color:var(--sub)" id="bandCritN">0</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-family:var(--mono);font-size:10px;color:var(--red)">Critical (75%+)</span><span style="font-family:var(--mono);font-size:10px;color:var(--white)" id="bandCritN">0</span></div>
             <div style="height:5px;background:var(--bg3);border-radius:3px;overflow:hidden"><div id="bandCritB" style="height:100%;background:var(--red);border-radius:3px;width:0%;transition:width .6s"></div></div>
           </div>
         </div>
@@ -522,7 +506,6 @@ function probColor(p){
 }
 
 function heatColor(p){
-  // Returns a CSS rgba color from green → red
   const t = Math.min(1, p/100);
   const r = Math.round(16 + (239-16)*t);
   const g = Math.round(185 + (68-185)*t);
@@ -546,65 +529,76 @@ function updateGauge(p){
 function drawRadar(scores){
   const svg = document.getElementById('radar');
   svg.innerHTML = '';
-  const cx=95, cy=78, r=52;
-  const labels = ['Amount','Merchant','Location','Time'];
+  
+  // Re-centered matrix configurations to avoid clipping
+  const cx = 120, cy = 90, r = 58;
+  const labels = ['Amount', 'Merchant', 'Location', 'Time'];
   const angles = [-Math.PI/2, 0, Math.PI/2, Math.PI];
 
   // Grid rings
-  [.25,.5,.75,1].forEach(lv=>{
-    const pr = r*lv;
-    const pts = angles.map(a=>`${cx+pr*Math.cos(a)},${cy+pr*Math.sin(a)}`).join(' ');
-    const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
-    poly.setAttribute('points',pts);
-    poly.setAttribute('fill','none');
-    poly.setAttribute('stroke','#1f1f1f');
-    poly.setAttribute('stroke-width','1');
+  [.25, .5, .75, 1].forEach(lv => {
+    const pr = r * lv;
+    const pts = angles.map(a => `${cx + pr * Math.cos(a)},${cy + pr * Math.sin(a)}`).join(' ');
+    const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    poly.setAttribute('points', pts);
+    poly.setAttribute('fill', 'none');
+    poly.setAttribute('stroke', '#222222');
+    poly.setAttribute('stroke-width', '1');
     svg.appendChild(poly);
   });
 
-  // Axes
-  angles.forEach(a=>{
-    const ln = document.createElementNS('http://www.w3.org/2000/svg','line');
-    ln.setAttribute('x1',cx); ln.setAttribute('y1',cy);
-    ln.setAttribute('x2',cx+r*Math.cos(a)); ln.setAttribute('y2',cy+r*Math.sin(a));
-    ln.setAttribute('stroke','#222'); ln.setAttribute('stroke-width','1');
+  // Axes lines
+  angles.forEach(a => {
+    const ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    ln.setAttribute('x1', cx); ln.setAttribute('y1', cy);
+    ln.setAttribute('x2', cx + r * Math.cos(a)); ln.setAttribute('y2', cy + r * Math.sin(a));
+    ln.setAttribute('stroke', '#2a2a2a'); ln.setAttribute('stroke-width', '1');
     svg.appendChild(ln);
   });
 
-  // Data
-  const dpPts = scores.map((s,i)=>{
-    const pr = r*Math.max(.04,s);
-    return `${cx+pr*Math.cos(angles[i])},${cy+pr*Math.sin(angles[i])}`;
+  // Data Polygon overlay
+  const dpPts = scores.map((s, i) => {
+    const pr = r * Math.max(.05, s);
+    return `${cx + pr * Math.cos(angles[i])},${cy + pr * Math.sin(angles[i])}`;
   });
-  const dp = document.createElementNS('http://www.w3.org/2000/svg','polygon');
-  dp.setAttribute('points',dpPts.join(' '));
-  dp.setAttribute('fill','rgba(59,130,246,.15)');
-  dp.setAttribute('stroke','#3b82f6');
-  dp.setAttribute('stroke-width','1.5');
+  const dp = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  dp.setAttribute('points', dpPts.join(' '));
+  dp.setAttribute('fill', 'rgba(59,130,246,.18)');
+  dp.setAttribute('stroke', '#3b82f6');
+  dp.setAttribute('stroke-width', '1.5');
   svg.appendChild(dp);
 
-  // Dots
-  scores.forEach((s,i)=>{
-    const pr = r*Math.max(.04,s);
-    const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
-    dot.setAttribute('cx', cx+pr*Math.cos(angles[i]));
-    dot.setAttribute('cy', cy+pr*Math.sin(angles[i]));
-    dot.setAttribute('r','3.5');
-    dot.setAttribute('fill','#3b82f6');
-    svg.appendChild(dot);
+  // Data node points
+  scores.forEach((s, i) => {
+    const pr = r * Math.max(.05, s);
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', cx + pr * Math.cos(angles[i]));
+    circle.setAttribute('cy', cy + pr * Math.sin(angles[i]));
+    circle.setAttribute('r', '3.5');
+    circle.setAttribute('fill', '#3b82f6');
+    svg.appendChild(circle);
   });
 
-  // Labels
-  const lblOff = [[0,-14],[20,5],[0,14],[-20,5]];
-  labels.forEach((lbl,i)=>{
-    const t = document.createElementNS('http://www.w3.org/2000/svg','text');
-    t.setAttribute('x', cx+(r+14)*Math.cos(angles[i])+lblOff[i][0]);
-    t.setAttribute('y', cy+(r+14)*Math.sin(angles[i])+lblOff[i][1]);
-    t.setAttribute('fill','#555');
-    t.setAttribute('font-size','9');
-    t.setAttribute('font-family','IBM Plex Mono,monospace');
-    t.setAttribute('text-anchor','middle');
-    t.setAttribute('letter-spacing','0.5');
+  // Structural label layout positions (All four text boxes cleanly attached)
+  const lblOffsets = [
+    [0, -12, 'middle'],  // Top: Amount
+    [10, 3, 'start'],    // Right: Merchant
+    [0, 15, 'middle'],   // Bottom: Location
+    [-10, 3, 'end']      // Left: Time
+  ];
+  
+  labels.forEach((lbl, i) => {
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    const ax = cx + (r + 10) * Math.cos(angles[i]) + lblOffsets[i][0];
+    const ay = cy + (r + 10) * Math.sin(angles[i]) + lblOffsets[i][1];
+    
+    t.setAttribute('x', ax);
+    t.setAttribute('y', ay);
+    t.setAttribute('fill', '#ffffff'); /* Visible clean white contrast labels */
+    t.setAttribute('font-size', '9');
+    t.setAttribute('font-family', 'IBM Plex Mono, monospace');
+    t.setAttribute('text-anchor', lblOffsets[i][2]);
+    t.setAttribute('letter-spacing', '0.5');
     t.textContent = lbl.toUpperCase();
     svg.appendChild(t);
   });
@@ -622,32 +616,29 @@ function drawHistory(){
   const data = history.slice(-20);
   if(!data.length){
     ctx.font = '10px IBM Plex Mono';
-    ctx.fillStyle = '#444';
+    ctx.fillStyle = '#666';
     ctx.textAlign = 'center';
     ctx.fillText('No data yet', W/2, H/2);
     return;
   }
 
-  // Grid lines
   ctx.strokeStyle = '#1a1a1a';
   ctx.lineWidth = 1;
   [0,25,50,75,100].forEach(v=>{
     const y = H - (v/100)*H;
     ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = '#444';
     ctx.font = '8px IBM Plex Mono';
     ctx.textAlign = 'left';
     ctx.fillText(v+'%', 2, y-2);
   });
 
-  // Threshold line at 50
   ctx.setLineDash([3,4]);
   ctx.strokeStyle = 'rgba(239,68,68,.3)';
   const ty = H - .5*H;
   ctx.beginPath(); ctx.moveTo(0,ty); ctx.lineTo(W,ty); ctx.stroke();
   ctx.setLineDash([]);
 
-  // Line
   const step = W / Math.max(data.length-1, 1);
   ctx.beginPath();
   ctx.strokeStyle = '#3b82f6';
@@ -659,7 +650,6 @@ function drawHistory(){
   });
   ctx.stroke();
 
-  // Fill under line
   ctx.save();
   ctx.beginPath();
   data.forEach((d,i)=>{ const x=i*step; const y=H-(d.prob/100)*H; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
@@ -673,7 +663,6 @@ function drawHistory(){
   ctx.fill();
   ctx.restore();
 
-  // Dots
   data.forEach((d,i)=>{
     const x = i*step;
     const y = H-(d.prob/100)*H;
@@ -695,13 +684,12 @@ function drawDist(){
 
   if(!history.length){
     ctx.font = '10px IBM Plex Mono';
-    ctx.fillStyle = '#444';
+    ctx.fillStyle = '#666';
     ctx.textAlign = 'center';
     ctx.fillText('No data yet', W/2, H/2);
     return;
   }
 
-  // Bucket into 10 bins of 10%
   const bins = Array(10).fill(0);
   history.forEach(d=>{ const b = Math.min(9, Math.floor(d.prob/10)); bins[b]++; });
   const maxB = Math.max(1,...bins);
@@ -718,7 +706,7 @@ function drawDist(){
     ctx.roundRect ? ctx.roundRect(x, y, bw-4, bh, 2) : ctx.rect(x,y,bw-4,bh);
     ctx.fill();
     if(cnt>0){
-      ctx.fillStyle = '#666';
+      ctx.fillStyle = '#fff';
       ctx.font = '9px IBM Plex Mono';
       ctx.textAlign = 'center';
       ctx.fillText(cnt, x+(bw-4)/2, y-2);
@@ -751,7 +739,7 @@ function buildHeatMap(){
     const c = document.createElement('div');
     c.className = 'heat-cell';
     c.style.background = heatColor(p);
-    c.style.color = p>40 ? '#fff' : '#666';
+    c.style.color = p>40 ? '#fff' : '#aaa';
     c.textContent = p+'%';
     c.title = MERCH_LABELS[i]+' / Day: '+p+'% fraud risk';
     dayRow.appendChild(c);
@@ -761,7 +749,7 @@ function buildHeatMap(){
     const c = document.createElement('div');
     c.className = 'heat-cell';
     c.style.background = heatColor(p);
-    c.style.color = p>40 ? '#fff' : '#666';
+    c.style.color = p>40 ? '#fff' : '#aaa';
     c.textContent = p+'%';
     c.title = MERCH_LABELS[i]+' / Night: '+p+'% fraud risk';
     nightRow.appendChild(c);
@@ -790,7 +778,6 @@ async function runCheck(){
     const p = d.fraud_prob;
     const flagged = d.prediction === 1;
 
-    // Banner
     const banner = document.getElementById('banner');
     banner.className = 'banner '+(flagged?'flagged':'cleared')+' fade-in';
     document.getElementById('bIcon').textContent = flagged ? '⚠' : '✓';
@@ -804,10 +791,8 @@ async function runCheck(){
     document.getElementById('bPct').textContent = p+'%';
     document.getElementById('bCi').textContent = `CI: ${d.ci_low}% – ${d.ci_high}%`;
 
-    // Gauge
     updateGauge(p);
 
-    // Risk bars
     const bd = d.breakdown;
     document.getElementById('rfAmt').textContent  = `${fmt(bd.amount)} / 40`;
     document.getElementById('rfMer').textContent  = `${fmt(bd.merchant)} / 25`;
@@ -818,7 +803,6 @@ async function runCheck(){
     document.getElementById('rfLocB').style.width  = (bd.location/20*100)+'%';
     document.getElementById('rfTimeB').style.width = (bd.time/15*100)+'%';
 
-    // CI bar
     document.getElementById('ciLow').textContent  = d.ci_low+'%';
     document.getElementById('ciMid').textContent  = p+'%';
     document.getElementById('ciHigh').textContent = d.ci_high+'%';
@@ -826,10 +810,8 @@ async function runCheck(){
     document.getElementById('confRange').style.width = (d.ci_high-d.ci_low)+'%';
     document.getElementById('confNeedle').style.left = 'calc('+p+'% - 1px)';
 
-    // Radar
     drawRadar([bd.amount/40, bd.merchant/25, bd.location/20, bd.time/15]);
 
-    // Velocity bars (contribution %)
     const total = bd.amount+bd.merchant+bd.location+bd.time;
     const vel = {
       amt: total?bd.amount/total*100:0,
@@ -846,39 +828,33 @@ async function runCheck(){
     document.getElementById('vLocV').textContent = vel.loc.toFixed(0)+'%';
     document.getElementById('vTimV').textContent = vel.tim.toFixed(0)+'%';
 
-    // Indicators
     const indList = document.getElementById('indList');
     indList.innerHTML = d.flags.map(f=>`
       <div class="ind-item"><span class="ind-dot"></span><span>${f}</span></div>
     `).join('');
 
-    // Model badge
     document.getElementById('modelBadge').textContent = d.model_used || 'RandomForest';
 
-    // History
     const now = new Date();
     const ts = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
     history.push({ time:ts, amount, prob:p, flagged, merchant:mLabel });
     probs.push(p);
 
-    // Recent checks table
     const tbody = document.getElementById('recentTbl');
     const rows = history.slice().reverse().slice(0,10);
     tbody.innerHTML = rows.map(r=>`
       <tr>
         <td>${r.time}</td>
         <td class="amt">$${parseFloat(r.amount).toFixed(2)}</td>
-        <td style="font-size:10px;color:var(--muted)">${r.merchant.split('/')[0].trim()}</td>
+        <td style="font-size:10px;color:#aaa">${r.merchant.split('/')[0].trim()}</td>
         <td><span class="rbadge ${r.flagged?'f':'c'}">${r.flagged?'FLAGGED':'CLEARED'}</span></td>
         <td class="${r.flagged?'pf':'pc'}">${r.prob}%</td>
       </tr>
     `).join('');
 
-    // Session counters
     document.getElementById('totalRun').textContent  = history.length;
     document.getElementById('totalFlag').textContent = history.filter(x=>x.flagged).length;
 
-    // Session metrics
     const avg = probs.reduce((a,b)=>a+b,0)/probs.length;
     const maxP = Math.max(...probs);
     const minP = Math.min(...probs);
@@ -892,7 +868,6 @@ async function runCheck(){
     document.getElementById('msMax').textContent    = maxP+'%';
     document.getElementById('msMin').textContent    = minP+'%';
 
-    // Score bands
     const bands = {low:0, med:0, high:0, crit:0};
     probs.forEach(pp=>{ if(pp<20) bands.low++; else if(pp<50) bands.med++; else if(pp<75) bands.high++; else bands.crit++; });
     const tot = probs.length;
@@ -902,7 +877,6 @@ async function runCheck(){
       document.getElementById('band'+b+'B').style.width = tot?(bands[k]/tot*100)+'%':'0%';
     });
 
-    // Charts
     drawHistory();
     drawDist();
 
