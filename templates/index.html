@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Risk Monitor v2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:        #000000;
+  --bg1:       #0a0a0a;
+  --bg2:       #111111;
+  --bg3:       #181818;
+  --bg4:       #1f1f1f;
+  --border:    #2a2a2a;
+  --border2:   #333333;
+  --dim:       #444444;
+  --muted:     #666666;
+  --sub:       #888888;
+  --base:      #aaaaaa;
+  --bright:    #cccccc;
+  --white:     #ffffff;
+  --blue:      #3b82f6;
+  --blue-dim:  rgba(59,130,246,.12);
+  --blue-glow: rgba(59,130,246,.25);
+  --cyan:      #06b6d4;
+  --cyan-dim:  rgba(6,182,212,.12);
+  --purple:    #8b5cf6;
+  --orange:    #f59e0b;
+  --green:     #10b981;
+  --green-dim: rgba(16,185,129,.12);
+  --green-glow:rgba(16,185,129,.3);
+  --red:       #ef4444;
+  --red-dim:   rgba(239,68,68,.12);
+  --red-glow:  rgba(239,68,68,.3);
+  --yellow:    #eab308;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+}
+
+body{background:var(--bg);color:var(--base);font-family:var(--sans);font-size:13px;min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ── TOPBAR ── */
+.topbar{height:44px;background:var(--bg1);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 18px;flex-shrink:0;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:26px;height:26px;background:var(--blue);border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:600;color:#fff;letter-spacing:-.5px}
+.logo-name{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--white);letter-spacing:.5px}
+.logo-ver{font-family:var(--mono);font-size:10px;color:var(--dim);background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:1px 6px}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.status-dot{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--sub)}
+.status-dot .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2.5s ease infinite;box-shadow:0 0 6px var(--green)}
+@keyframes blink{0%,100%{opacity:1}60%{opacity:.3}}
+.badge{font-family:var(--mono);font-size:11px;background:var(--bg2);border:1px solid var(--border);color:var(--sub);border-radius:3px;padding:2px 8px}
+.acc{font-family:var(--mono);font-size:11px;color:var(--green)}
+
+/* ── LAYOUT ── */
+.layout{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:268px;flex-shrink:0;background:var(--bg1);border-right:1px solid var(--border);padding:18px 14px;display:flex;flex-direction:column;gap:16px;overflow-y:auto}
+.sec-lbl{font-family:var(--mono);font-size:10px;letter-spacing:1.8px;color:var(--dim);text-transform:uppercase;margin-bottom:6px}
+.field-lbl{font-family:var(--mono);font-size:9px;letter-spacing:1.4px;color:var(--dim);text-transform:uppercase;margin-bottom:5px}
+.inp-wrap{display:flex;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:0 10px;height:34px;gap:6px;transition:border-color .2s}
+.inp-wrap:focus-within{border-color:var(--blue)}
+.inp-wrap .pfx{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.inp-wrap input{background:none;border:none;outline:none;color:var(--white);font-family:var(--mono);font-size:13px;width:100%}
+.inp-wrap input::placeholder{color:var(--dim)}
+.sel-wrap{position:relative}
+.sel-wrap select{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:0 28px 0 10px;height:34px;color:var(--white);font-family:var(--sans);font-size:13px;outline:none;appearance:none;cursor:pointer;transition:border-color .2s}
+.sel-wrap select:focus{border-color:var(--blue)}
+.sel-wrap::after{content:'▾';position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;font-size:11px}
+.toggle-row{display:flex;gap:5px}
+.tbtn{flex:1;height:32px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--muted);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s}
+.tbtn.on{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 0 14px var(--blue-glow)}
+.tbtn:hover:not(.on){border-color:var(--blue);color:var(--bright)}
+.run-btn{width:100%;height:40px;border-radius:6px;background:var(--blue);border:none;color:#fff;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.3px;transition:all .15s;box-shadow:0 0 20px var(--blue-glow)}
+.run-btn:hover{background:#2563eb;box-shadow:0 0 28px var(--blue-glow)}
+.run-btn:active{transform:scale(.98)}
+.stat-row{display:flex;gap:6px}
+.stat-card{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:10px 11px}
+.stat-card .v{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--white);line-height:1}
+.stat-card.flag .v{color:var(--red)}
+.stat-card .l{font-family:var(--mono);font-size:9px;letter-spacing:1.2px;color:var(--dim);text-transform:uppercase;margin-top:4px}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+
+/* ── STATUS BANNER ── */
+.banner{border-radius:8px;border:1px solid;padding:13px 18px;display:flex;align-items:center;justify-content:space-between}
+.banner.cleared{background:var(--green-dim);border-color:rgba(16,185,129,.25)}
+.banner.flagged{background:var(--red-dim);border-color:rgba(239,68,68,.3)}
+.banner.idle{background:var(--bg2);border-color:var(--border)}
+.b-left{display:flex;align-items:center;gap:11px}
+.b-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.cleared .b-icon{background:rgba(16,185,129,.15)}
+.flagged .b-icon{background:rgba(239,68,68,.15)}
+.idle .b-icon{background:var(--bg3)}
+.b-title{font-family:var(--mono);font-size:14px;font-weight:600;line-height:1}
+.cleared .b-title{color:var(--green)}
+.flagged .b-title{color:var(--red)}
+.idle .b-title{color:var(--sub)}
+.b-sub{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:3px;letter-spacing:.3px}
+.b-right{text-align:right}
+.b-pct{font-family:var(--mono);font-size:30px;font-weight:700;line-height:1}
+.cleared .b-pct{color:var(--green)}
+.flagged .b-pct{color:var(--red)}
+.idle .b-pct{color:var(--dim)}
+.b-pct-lbl{font-family:var(--mono);font-size:9px;letter-spacing:1.4px;color:var(--dim);text-transform:uppercase}
+.b-ci{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px}
+
+/* ── TIER BADGE ── */
+.tier{display:inline-block;padding:2px 8px;border-radius:3px;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:1px;margin-top:4px}
+.tier.LOW{background:var(--green-dim);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+.tier.MEDIUM{background:rgba(234,179,8,.1);color:var(--yellow);border:1px solid rgba(234,179,8,.3)}
+.tier.HIGH{background:rgba(245,158,11,.1);color:var(--orange);border:1px solid rgba(245,158,11,.3)}
+.tier.CRITICAL{background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+
+/* ── GRID ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.g13{display:grid;grid-template-columns:1fr 1.6fr;gap:12px}
+
+/* ── CARD ── */
+.card{background:var(--bg1);border:1px solid var(--border);border-radius:8px;padding:14px}
+.c-title{font-family:var(--mono);font-size:9px;letter-spacing:1.8px;color:var(--dim);text-transform:uppercase;margin-bottom:12px}
+
+/* ── RISK FACTOR BARS ── */
+.rf{margin-bottom:10px}
+.rf:last-child{margin-bottom:0}
+.rf-hd{display:flex;justify-content:space-between;margin-bottom:4px}
+.rf-name{font-family:var(--sans);font-size:12px;color:var(--sub)}
+.rf-score{font-family:var(--mono);font-size:11px;color:var(--bright)}
+.rf-bg{height:3px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.rf-fill{height:100%;border-radius:2px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+
+/* ── GAUGE ── */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;padding:6px 0 0}
+
+/* ── RADAR ── */
+.radar-wrap{display:flex;align-items:center;justify-content:center;min-height:155px}
+
+/* ── RECENT CHECKS ── */
+.tbl{width:100%;border-collapse:collapse}
+.tbl thead th{font-family:var(--mono);font-size:9px;letter-spacing:1.3px;color:var(--dim);text-transform:uppercase;padding:0 6px 8px;text-align:left;border-bottom:1px solid var(--border)}
+.tbl tbody tr{border-bottom:1px solid rgba(42,42,42,.5);transition:background .12s}
+.tbl tbody tr:hover{background:var(--bg2)}
+.tbl tbody td{padding:7px 6px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.tbl td.amt{color:var(--bright)}
+.rbadge{display:inline-block;padding:2px 7px;border-radius:3px;font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.8px}
+.rbadge.c{background:var(--green-dim);color:var(--green);border:1px solid rgba(16,185,129,.25)}
+.rbadge.f{background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+td.pc{color:var(--green);font-family:var(--mono);font-size:11px}
+td.pf{color:var(--red);font-family:var(--mono);font-size:11px}
+
+/* ── INDICATORS ── */
+.ind-list{display:flex;flex-direction:column;gap:7px}
+.ind-item{display:flex;align-items:center;gap:8px;font-family:var(--sans);font-size:12px;color:var(--sub)}
+.ind-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);box-shadow:0 0 5px var(--orange);flex-shrink:0}
+
+/* ── HISTORY CHART ── */
+#histChart{width:100%;height:120px}
+
+/* ── SCORE DIST CHART ── */
+#distChart{width:100%;height:110px}
+
+/* ── HEAT MATRIX ── */
+.heat-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:4px}
+.heat-cell{height:28px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;color:var(--sub);transition:all .3s;cursor:default}
+.heat-lbl-row{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px}
+.heat-lbl{font-family:var(--mono);font-size:8px;color:var(--dim);text-align:center;letter-spacing:.5px}
+
+/* ── VELOCITY PANEL ── */
+.vel-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+.vel-item:last-child{border-bottom:none}
+.vel-lbl{font-family:var(--sans);font-size:12px;color:var(--sub);flex:1}
+.vel-bar-bg{flex:2;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.vel-bar-fill{height:100%;border-radius:2px;transition:width .6s ease}
+.vel-val{font-family:var(--mono);font-size:11px;color:var(--bright);width:36px;text-align:right}
+
+/* ── MINI STAT CARDS ── */
+.mini-stat{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
+.ms-val{font-family:var(--mono);font-size:18px;font-weight:600;color:var(--white);line-height:1}
+.ms-lbl{font-family:var(--mono);font-size:9px;letter-spacing:1.2px;color:var(--dim);text-transform:uppercase}
+.ms-delta{font-family:var(--mono);font-size:10px;margin-top:2px}
+.ms-delta.up{color:var(--red)}
+.ms-delta.dn{color:var(--green)}
+
+/* ── CONFIDENCE BAR ── */
+.conf-track{height:6px;background:var(--bg3);border-radius:3px;position:relative;overflow:visible;margin:10px 0 4px}
+.conf-range{height:100%;border-radius:3px;position:absolute;transition:all .6s ease}
+.conf-needle{width:2px;height:14px;background:var(--white);border-radius:1px;position:absolute;top:-4px;transition:left .6s ease}
+.conf-labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--dim)}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.fade-in{animation:fadeUp .3s ease forwards}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-icon">RM</div>
+    <span class="logo-name">Risk Monitor</span>
+    <span class="logo-ver">v2.0</span>
+  </div>
+  <div class="topbar-right">
+    <div class="status-dot"><span class="dot"></span>Model online</div>
+    <span class="badge" id="modelBadge">RandomForest</span>
+    <span class="acc" id="accBadge">99.38% acc</span>
+  </div>
+</header>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div>
+    <div class="sec-lbl">Transaction Details</div>
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <div>
+        <div class="field-lbl">Amount (USD)</div>
+        <div class="inp-wrap"><span class="pfx">$</span><input type="number" id="amount" value="250" min="1" placeholder="0.00"/></div>
+      </div>
+      <div>
+        <div class="field-lbl">Merchant Category</div>
+        <div class="sel-wrap">
+          <select id="merchant">
+            <option value="grocery">Grocery / Supermarket</option>
+            <option value="utility">Utility / Bill Payment</option>
+            <option value="restaurant">Restaurant / Dining</option>
+            <option value="gas">Gas Station</option>
+            <option value="medical">Medical / Pharmacy</option>
+            <option value="online">Online Retail</option>
+            <option value="electronics">Electronics</option>
+            <option value="travel">Travel & Airlines</option>
+            <option value="entertainment">Entertainment / Gaming</option>
+            <option value="atm">ATM / Cash Withdrawal</option>
+            <option value="luxury">Luxury / Jewelry</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <div class="field-lbl">Transaction Origin</div>
+        <div class="sel-wrap">
+          <select id="location">
+            <option value="local">Local</option>
+            <option value="foreign">International / Foreign</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <div class="field-lbl">Time of Day</div>
+        <div class="toggle-row">
+          <button class="tbtn on" id="btnDay" onclick="setTime('day')">☀ Day</button>
+          <button class="tbtn" id="btnNight" onclick="setTime('night')">☽ Night</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="run-btn" onclick="runCheck()">Run Risk Check</button>
+
+  <div>
+    <div class="sec-lbl">Session Stats</div>
+    <div class="stat-row">
+      <div class="stat-card"><div class="v" id="totalRun">0</div><div class="l">Checks Run</div></div>
+      <div class="stat-card flag"><div class="v" id="totalFlag">0</div><div class="l">Flagged</div></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec-lbl">Session Metrics</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--sub)">Avg Fraud Prob</span>
+        <span style="font-family:var(--mono);font-size:12px;color:var(--bright)" id="avgProb">—</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--sub)">Flag Rate</span>
+        <span style="font-family:var(--mono);font-size:12px;color:var(--bright)" id="flagRate">—</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--sub)">Max Prob Seen</span>
+        <span style="font-family:var(--mono);font-size:12px;color:var(--red)" id="maxProb">—</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--sub)">Min Prob Seen</span>
+        <span style="font-family:var(--mono);font-size:12px;color:var(--green)" id="minProb">—</span>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- STATUS BANNER -->
+  <div class="banner idle fade-in" id="banner">
+    <div class="b-left">
+      <div class="b-icon" id="bIcon">—</div>
+      <div>
+        <div class="b-title" id="bTitle">Awaiting transaction</div>
+        <div class="b-sub" id="bSub">Configure inputs and run a risk check</div>
+        <div id="bTier"></div>
+      </div>
+    </div>
+    <div class="b-right">
+      <div class="b-pct" id="bPct">—</div>
+      <div class="b-pct-lbl">Fraud Probability</div>
+      <div class="b-ci" id="bCi"></div>
+    </div>
+  </div>
+
+  <!-- ROW 1 -->
+  <div class="g2">
+    <!-- Risk Factor Breakdown -->
+    <div class="card">
+      <div class="c-title">Risk Factor Breakdown</div>
+      <div class="rf">
+        <div class="rf-hd"><span class="rf-name">Amount</span><span class="rf-score" id="rfAmt">— / 40</span></div>
+        <div class="rf-bg"><div class="rf-fill" id="rfAmtB" style="width:0%;background:var(--blue)"></div></div>
+      </div>
+      <div class="rf">
+        <div class="rf-hd"><span class="rf-name">Merchant Type</span><span class="rf-score" id="rfMer">— / 25</span></div>
+        <div class="rf-bg"><div class="rf-fill" id="rfMerB" style="width:0%;background:var(--purple)"></div></div>
+      </div>
+      <div class="rf">
+        <div class="rf-hd"><span class="rf-name">Location</span><span class="rf-score" id="rfLoc">— / 20</span></div>
+        <div class="rf-bg"><div class="rf-fill" id="rfLocB" style="width:0%;background:var(--orange)"></div></div>
+      </div>
+      <div class="rf">
+        <div class="rf-hd"><span class="rf-name">Time of Day</span><span class="rf-score" id="rfTime">— / 15</span></div>
+        <div class="rf-bg"><div class="rf-fill" id="rfTimeB" style="width:0%;background:var(--cyan)"></div></div>
+      </div>
+
+      <!-- Confidence interval bar -->
+      <div style="margin-top:18px">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:1.4px;color:var(--dim);text-transform:uppercase;margin-bottom:2px">Model Confidence Interval</div>
+        <div class="conf-track" id="confTrack">
+          <div class="conf-range" id="confRange" style="background:rgba(59,130,246,.25);left:0%;width:0%"></div>
+          <div class="conf-needle" id="confNeedle" style="left:0%"></div>
+        </div>
+        <div class="conf-labels"><span id="ciLow">—</span><span id="ciMid">—%</span><span id="ciHigh">—</span></div>
+      </div>
+    </div>
+
+    <!-- Gauge + Radar split -->
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <!-- Gauge -->
+      <div class="card" style="flex:1">
+        <div class="c-title">Fraud Probability</div>
+        <div class="gauge-wrap">
+          <svg width="220" height="120" viewBox="0 0 220 120" style="overflow:visible">
+            <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="#1a1a1a" stroke-width="16" stroke-linecap="round"/>
+            <path id="gFill" d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="var(--green)" stroke-width="16" stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283" style="transition:stroke-dashoffset .9s cubic-bezier(.4,0,.2,1),stroke .4s"/>
+            <text id="gTxt" x="110" y="100" fill="var(--green)" font-family="IBM Plex Mono,monospace" font-size="26" font-weight="600" text-anchor="middle">—</text>
+            <text x="110" y="116" fill="#444" font-family="IBM Plex Mono,monospace" font-size="9" text-anchor="middle" letter-spacing="1.5">FRAUD PROB</text>
+          </svg>
+        </div>
+      </div>
+      <!-- Risk Profile Radar -->
+      <div class="card" style="flex:1">
+        <div class="c-title">Risk Profile</div>
+        <div class="radar-wrap"><svg id="radar" width="190" height="150" viewBox="0 0 190 150"></svg></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 2 — History sparkline + Session distribution -->
+  <div class="g2">
+    <div class="card">
+      <div class="c-title">Fraud Probability — Check History</div>
+      <canvas id="histChart"></canvas>
+      <div style="display:flex;gap:14px;margin-top:8px">
+        <div style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:2px;background:var(--blue);display:inline-block;border-radius:1px"></span><span style="font-family:var(--mono);font-size:10px;color:var(--dim)">Fraud prob %</span></div>
+        <div style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;background:var(--red);display:inline-block;border-radius:50%"></span><span style="font-family:var(--mono);font-size:10px;color:var(--dim)">Flagged</span></div>
+        <div style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;background:var(--green);display:inline-block;border-radius:50%"></span><span style="font-family:var(--mono);font-size:10px;color:var(--dim)">Cleared</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="c-title">Score Distribution — Session</div>
+      <canvas id="distChart"></canvas>
+      <div style="display:flex;justify-content:space-between;margin-top:8px">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--dim)">0%</span>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--dim)">25%</span>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--dim)">50%</span>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--dim)">75%</span>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--dim)">100%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 3 — Recent Checks + Indicators -->
+  <div class="g13">
+    <div class="card">
+      <div class="c-title">Indicators Detected</div>
+      <div class="ind-list" id="indList">
+        <div class="ind-item"><span class="ind-dot" style="background:var(--dim);box-shadow:none"></span><span style="color:var(--dim)">No check run yet</span></div>
+      </div>
+      <!-- Risk velocity -->
+      <div style="margin-top:16px">
+        <div class="c-title" style="margin-bottom:8px">Risk Component Velocity</div>
+        <div id="velPanel">
+          <div class="vel-item"><span class="vel-lbl">Amount</span><div class="vel-bar-bg"><div class="vel-bar-fill" id="vAmt" style="width:0%;background:var(--blue)"></div></div><span class="vel-val" id="vAmtV">0%</span></div>
+          <div class="vel-item"><span class="vel-lbl">Merchant</span><div class="vel-bar-bg"><div class="vel-bar-fill" id="vMer" style="width:0%;background:var(--purple)"></div></div><span class="vel-val" id="vMerV">0%</span></div>
+          <div class="vel-item"><span class="vel-lbl">Location</span><div class="vel-bar-bg"><div class="vel-bar-fill" id="vLoc" style="width:0%;background:var(--orange)"></div></div><span class="vel-val" id="vLocV">0%</span></div>
+          <div class="vel-item"><span class="vel-lbl">Time</span><div class="vel-bar-bg"><div class="vel-bar-fill" id="vTim" style="width:0%;background:var(--cyan)"></div></div><span class="vel-val" id="vTimV">0%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="c-title">Recent Checks</div>
+      <table class="tbl">
+        <thead><tr><th>Time</th><th>Amount</th><th>Merchant</th><th>Result</th><th>%</th></tr></thead>
+        <tbody id="recentTbl"><tr><td colspan="5" style="color:var(--dim);font-size:11px;padding:12px 6px">No checks yet</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ROW 4 — Merchant heat map + Mini stats -->
+  <div class="g2">
+    <div class="card">
+      <div class="c-title">Merchant Risk Heat Map (Day vs Night)</div>
+      <div class="heat-lbl-row" id="heatLabels"></div>
+      <div style="display:flex;gap:8px">
+        <div style="display:flex;flex-direction:column;justify-content:space-around;padding:4px 0">
+          <span style="font-family:var(--mono);font-size:8px;color:var(--dim);writing-mode:horizontal-tb">Day</span>
+          <span style="font-family:var(--mono);font-size:8px;color:var(--dim);writing-mode:horizontal-tb">Night</span>
+        </div>
+        <div style="flex:1">
+          <div class="heat-grid" id="heatDay" style="margin-bottom:3px"></div>
+          <div class="heat-grid" id="heatNight"></div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:10px">
+        <span style="font-family:var(--mono);font-size:9px;color:var(--dim)">Low risk</span>
+        <div style="flex:1;height:4px;border-radius:2px;background:linear-gradient(to right,var(--green),var(--yellow),var(--orange),var(--red))"></div>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--dim)">High risk</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="c-title">Session Performance Metrics</div>
+      <div class="g2" style="gap:8px">
+        <div class="mini-stat">
+          <div class="ms-val" id="msAvg">—</div>
+          <div class="ms-lbl">Avg Score</div>
+          <div class="ms-delta" id="msAvgD"></div>
+        </div>
+        <div class="mini-stat">
+          <div class="ms-val" id="msFlagRate">—</div>
+          <div class="ms-lbl">Flag Rate</div>
+        </div>
+        <div class="mini-stat">
+          <div class="ms-val" id="msMax" style="color:var(--red)">—</div>
+          <div class="ms-lbl">Highest Risk</div>
+        </div>
+        <div class="mini-stat">
+          <div class="ms-val" id="msMin" style="color:var(--green)">—</div>
+          <div class="ms-lbl">Lowest Risk</div>
+        </div>
+      </div>
+
+      <!-- Score band breakdown pie-ish bar -->
+      <div style="margin-top:14px">
+        <div class="c-title" style="margin-bottom:8px">Score Band Distribution</div>
+        <div style="display:flex;flex-direction:column;gap:6px" id="bandBars">
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-family:var(--mono);font-size:10px;color:var(--green)">Low (0–20%)</span><span style="font-family:var(--mono);font-size:10px;color:var(--sub)" id="bandLowN">0</span></div>
+            <div style="height:5px;background:var(--bg3);border-radius:3px;overflow:hidden"><div id="bandLowB" style="height:100%;background:var(--green);border-radius:3px;width:0%;transition:width .6s"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-family:var(--mono);font-size:10px;color:var(--yellow)">Medium (20–50%)</span><span style="font-family:var(--mono);font-size:10px;color:var(--sub)" id="bandMedN">0</span></div>
+            <div style="height:5px;background:var(--bg3);border-radius:3px;overflow:hidden"><div id="bandMedB" style="height:100%;background:var(--yellow);border-radius:3px;width:0%;transition:width .6s"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-family:var(--mono);font-size:10px;color:var(--orange)">High (50–75%)</span><span style="font-family:var(--mono);font-size:10px;color:var(--sub)" id="bandHighN">0</span></div>
+            <div style="height:5px;background:var(--bg3);border-radius:3px;overflow:hidden"><div id="bandHighB" style="height:100%;background:var(--orange);border-radius:3px;width:0%;transition:width .6s"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-family:var(--mono);font-size:10px;color:var(--red)">Critical (75%+)</span><span style="font-family:var(--mono);font-size:10px;color:var(--sub)" id="bandCritN">0</span></div>
+            <div style="height:5px;background:var(--bg3);border-radius:3px;overflow:hidden"><div id="bandCritB" style="height:100%;background:var(--red);border-radius:3px;width:0%;transition:width .6s"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+let tod = 'day';
+let history = [];
+let probs = [];
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function setTime(t){
+  tod = t;
+  document.getElementById('btnDay').classList.toggle('on', t==='day');
+  document.getElementById('btnNight').classList.toggle('on', t==='night');
+}
+
+function fmt(n){ return parseFloat(n).toFixed(1); }
+
+function probColor(p){
+  if(p < 20) return 'var(--green)';
+  if(p < 50) return 'var(--yellow)';
+  if(p < 75) return 'var(--orange)';
+  return 'var(--red)';
+}
+
+function heatColor(p){
+  // Returns a CSS rgba color from green → red
+  const t = Math.min(1, p/100);
+  const r = Math.round(16 + (239-16)*t);
+  const g = Math.round(185 + (68-185)*t);
+  const b = Math.round(129 + (68-129)*t);
+  return `rgba(${r},${g},${b},${0.15 + 0.55*t})`;
+}
+
+// ── Gauge ─────────────────────────────────────────────────────────────────────
+function updateGauge(p){
+  const fill = document.getElementById('gFill');
+  const txt  = document.getElementById('gTxt');
+  const arc  = 283;
+  fill.style.strokeDashoffset = arc - (arc * p / 100);
+  const c = probColor(p);
+  fill.style.stroke = c;
+  txt.setAttribute('fill', c);
+  txt.textContent = p + '%';
+}
+
+// ── Radar ─────────────────────────────────────────────────────────────────────
+function drawRadar(scores){
+  const svg = document.getElementById('radar');
+  svg.innerHTML = '';
+  const cx=95, cy=78, r=52;
+  const labels = ['Amount','Merchant','Location','Time'];
+  const angles = [-Math.PI/2, 0, Math.PI/2, Math.PI];
+
+  // Grid rings
+  [.25,.5,.75,1].forEach(lv=>{
+    const pr = r*lv;
+    const pts = angles.map(a=>`${cx+pr*Math.cos(a)},${cy+pr*Math.sin(a)}`).join(' ');
+    const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    poly.setAttribute('points',pts);
+    poly.setAttribute('fill','none');
+    poly.setAttribute('stroke','#1f1f1f');
+    poly.setAttribute('stroke-width','1');
+    svg.appendChild(poly);
+  });
+
+  // Axes
+  angles.forEach(a=>{
+    const ln = document.createElementNS('http://www.w3.org/2000/svg','line');
+    ln.setAttribute('x1',cx); ln.setAttribute('y1',cy);
+    ln.setAttribute('x2',cx+r*Math.cos(a)); ln.setAttribute('y2',cy+r*Math.sin(a));
+    ln.setAttribute('stroke','#222'); ln.setAttribute('stroke-width','1');
+    svg.appendChild(ln);
+  });
+
+  // Data
+  const dpPts = scores.map((s,i)=>{
+    const pr = r*Math.max(.04,s);
+    return `${cx+pr*Math.cos(angles[i])},${cy+pr*Math.sin(angles[i])}`;
+  });
+  const dp = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+  dp.setAttribute('points',dpPts.join(' '));
+  dp.setAttribute('fill','rgba(59,130,246,.15)');
+  dp.setAttribute('stroke','#3b82f6');
+  dp.setAttribute('stroke-width','1.5');
+  svg.appendChild(dp);
+
+  // Dots
+  scores.forEach((s,i)=>{
+    const pr = r*Math.max(.04,s);
+    const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dot.setAttribute('cx', cx+pr*Math.cos(angles[i]));
+    dot.setAttribute('cy', cy+pr*Math.sin(angles[i]));
+    dot.setAttribute('r','3.5');
+    dot.setAttribute('fill','#3b82f6');
+    svg.appendChild(dot);
+  });
+
+  // Labels
+  const lblOff = [[0,-14],[20,5],[0,14],[-20,5]];
+  labels.forEach((lbl,i)=>{
+    const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x', cx+(r+14)*Math.cos(angles[i])+lblOff[i][0]);
+    t.setAttribute('y', cy+(r+14)*Math.sin(angles[i])+lblOff[i][1]);
+    t.setAttribute('fill','#555');
+    t.setAttribute('font-size','9');
+    t.setAttribute('font-family','IBM Plex Mono,monospace');
+    t.setAttribute('text-anchor','middle');
+    t.setAttribute('letter-spacing','0.5');
+    t.textContent = lbl.toUpperCase();
+    svg.appendChild(t);
+  });
+}
+
+// ── History Canvas Chart ───────────────────────────────────────────────────────
+function drawHistory(){
+  const canvas = document.getElementById('histChart');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 400;
+  const H = 120;
+  canvas.width = W; canvas.height = H;
+  ctx.clearRect(0,0,W,H);
+
+  const data = history.slice(-20);
+  if(!data.length){
+    ctx.font = '10px IBM Plex Mono';
+    ctx.fillStyle = '#444';
+    ctx.textAlign = 'center';
+    ctx.fillText('No data yet', W/2, H/2);
+    return;
+  }
+
+  // Grid lines
+  ctx.strokeStyle = '#1a1a1a';
+  ctx.lineWidth = 1;
+  [0,25,50,75,100].forEach(v=>{
+    const y = H - (v/100)*H;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+    ctx.fillStyle = '#333';
+    ctx.font = '8px IBM Plex Mono';
+    ctx.textAlign = 'left';
+    ctx.fillText(v+'%', 2, y-2);
+  });
+
+  // Threshold line at 50
+  ctx.setLineDash([3,4]);
+  ctx.strokeStyle = 'rgba(239,68,68,.3)';
+  const ty = H - .5*H;
+  ctx.beginPath(); ctx.moveTo(0,ty); ctx.lineTo(W,ty); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Line
+  const step = W / Math.max(data.length-1, 1);
+  ctx.beginPath();
+  ctx.strokeStyle = '#3b82f6';
+  ctx.lineWidth = 2;
+  data.forEach((d,i)=>{
+    const x = i*step;
+    const y = H - (d.prob/100)*H;
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // Fill under line
+  ctx.save();
+  ctx.beginPath();
+  data.forEach((d,i)=>{ const x=i*step; const y=H-(d.prob/100)*H; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+  ctx.lineTo((data.length-1)*step, H);
+  ctx.lineTo(0, H);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'rgba(59,130,246,.18)');
+  grad.addColorStop(1,'rgba(59,130,246,0)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+  ctx.restore();
+
+  // Dots
+  data.forEach((d,i)=>{
+    const x = i*step;
+    const y = H-(d.prob/100)*H;
+    ctx.beginPath();
+    ctx.arc(x,y,3.5,0,Math.PI*2);
+    ctx.fillStyle = d.flagged ? '#ef4444' : '#10b981';
+    ctx.fill();
+  });
+}
+
+// ── Distribution Bar Chart ─────────────────────────────────────────────────────
+function drawDist(){
+  const canvas = document.getElementById('distChart');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 400;
+  const H = 110;
+  canvas.width = W; canvas.height = H;
+  ctx.clearRect(0,0,W,H);
+
+  if(!history.length){
+    ctx.font = '10px IBM Plex Mono';
+    ctx.fillStyle = '#444';
+    ctx.textAlign = 'center';
+    ctx.fillText('No data yet', W/2, H/2);
+    return;
+  }
+
+  // Bucket into 10 bins of 10%
+  const bins = Array(10).fill(0);
+  history.forEach(d=>{ const b = Math.min(9, Math.floor(d.prob/10)); bins[b]++; });
+  const maxB = Math.max(1,...bins);
+  const bw = W/10;
+
+  bins.forEach((cnt,i)=>{
+    const x = i*bw + 2;
+    const bh = Math.max(2, (cnt/maxB)*(H-20));
+    const y = H-bh-10;
+    const t = i/9;
+    const r = Math.round(16+(239-16)*t), g2 = Math.round(185+(68-185)*t), b2 = Math.round(129+(68-129)*t);
+    ctx.fillStyle = `rgba(${r},${g2},${b2},0.7)`;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(x, y, bw-4, bh, 2) : ctx.rect(x,y,bw-4,bh);
+    ctx.fill();
+    if(cnt>0){
+      ctx.fillStyle = '#666';
+      ctx.font = '9px IBM Plex Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText(cnt, x+(bw-4)/2, y-2);
+    }
+  });
+}
+
+// ── Heat Map ───────────────────────────────────────────────────────────────────
+const MERCHANTS = ['grocery','utility','online','travel','atm','luxury','entertainment'];
+const MERCH_LABELS = ['Grocery','Utility','Online','Travel','ATM','Luxury','Entertain'];
+const HEAT_PROBS_DAY   = [5, 4, 22, 18, 35, 25, 15];
+const HEAT_PROBS_NIGHT = [12, 8, 58, 42, 82, 78, 75];
+
+function buildHeatMap(){
+  const lblRow = document.getElementById('heatLabels');
+  const dayRow = document.getElementById('heatDay');
+  const nightRow = document.getElementById('heatNight');
+  lblRow.innerHTML = '';
+  dayRow.innerHTML = '';
+  nightRow.innerHTML = '';
+
+  MERCH_LABELS.forEach(l=>{
+    const d = document.createElement('div');
+    d.className = 'heat-lbl';
+    d.textContent = l.substring(0,7);
+    lblRow.appendChild(d);
+  });
+
+  HEAT_PROBS_DAY.forEach((p,i)=>{
+    const c = document.createElement('div');
+    c.className = 'heat-cell';
+    c.style.background = heatColor(p);
+    c.style.color = p>40 ? '#fff' : '#666';
+    c.textContent = p+'%';
+    c.title = MERCH_LABELS[i]+' / Day: '+p+'% fraud risk';
+    dayRow.appendChild(c);
+  });
+
+  HEAT_PROBS_NIGHT.forEach((p,i)=>{
+    const c = document.createElement('div');
+    c.className = 'heat-cell';
+    c.style.background = heatColor(p);
+    c.style.color = p>40 ? '#fff' : '#666';
+    c.textContent = p+'%';
+    c.title = MERCH_LABELS[i]+' / Night: '+p+'% fraud risk';
+    nightRow.appendChild(c);
+  });
+}
+
+// ── Main run ───────────────────────────────────────────────────────────────────
+async function runCheck(){
+  const amount   = parseFloat(document.getElementById('amount').value)||0;
+  const merchant = document.getElementById('merchant').value;
+  const location = document.getElementById('location').value;
+
+  const btn = document.querySelector('.run-btn');
+  btn.textContent = 'Analyzing…';
+  btn.disabled = true;
+
+  try{
+    const resp = await fetch('/predict',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ amount, merchant, time_of_day: tod, location })
+    });
+    const d = await resp.json();
+    if(d.error){ alert('Error: '+d.error); return; }
+
+    const p = d.fraud_prob;
+    const flagged = d.prediction === 1;
+
+    // Banner
+    const banner = document.getElementById('banner');
+    banner.className = 'banner '+(flagged?'flagged':'cleared')+' fade-in';
+    document.getElementById('bIcon').textContent = flagged ? '⚠' : '✓';
+    document.getElementById('bTitle').textContent = flagged ? 'Transaction Flagged' : 'Transaction Cleared';
+    const mLabel = d.merchant_label || merchant;
+    const locLabel = location==='foreign'?'International':'Local';
+    const tLabel = tod==='night'?'Night-time':'Day-time';
+    document.getElementById('bSub').textContent = `${mLabel} · $${amount.toFixed(2)} · ${locLabel} · ${tLabel}`;
+    const tierEl = document.getElementById('bTier');
+    tierEl.innerHTML = `<span class="tier ${d.risk_tier}">${d.risk_tier} RISK</span>`;
+    document.getElementById('bPct').textContent = p+'%';
+    document.getElementById('bCi').textContent = `CI: ${d.ci_low}% – ${d.ci_high}%`;
+
+    // Gauge
+    updateGauge(p);
+
+    // Risk bars
+    const bd = d.breakdown;
+    document.getElementById('rfAmt').textContent  = `${fmt(bd.amount)} / 40`;
+    document.getElementById('rfMer').textContent  = `${fmt(bd.merchant)} / 25`;
+    document.getElementById('rfLoc').textContent  = `${fmt(bd.location)} / 20`;
+    document.getElementById('rfTime').textContent = `${fmt(bd.time)} / 15`;
+    document.getElementById('rfAmtB').style.width  = (bd.amount/40*100)+'%';
+    document.getElementById('rfMerB').style.width  = (bd.merchant/25*100)+'%';
+    document.getElementById('rfLocB').style.width  = (bd.location/20*100)+'%';
+    document.getElementById('rfTimeB').style.width = (bd.time/15*100)+'%';
+
+    // CI bar
+    document.getElementById('ciLow').textContent  = d.ci_low+'%';
+    document.getElementById('ciMid').textContent  = p+'%';
+    document.getElementById('ciHigh').textContent = d.ci_high+'%';
+    document.getElementById('confRange').style.left  = d.ci_low+'%';
+    document.getElementById('confRange').style.width = (d.ci_high-d.ci_low)+'%';
+    document.getElementById('confNeedle').style.left = 'calc('+p+'% - 1px)';
+
+    // Radar
+    drawRadar([bd.amount/40, bd.merchant/25, bd.location/20, bd.time/15]);
+
+    // Velocity bars (contribution %)
+    const total = bd.amount+bd.merchant+bd.location+bd.time;
+    const vel = {
+      amt: total?bd.amount/total*100:0,
+      mer: total?bd.merchant/total*100:0,
+      loc: total?bd.location/total*100:0,
+      tim: total?bd.time/total*100:0
+    };
+    document.getElementById('vAmt').style.width = vel.amt+'%';
+    document.getElementById('vMer').style.width = vel.mer+'%';
+    document.getElementById('vLoc').style.width = vel.loc+'%';
+    document.getElementById('vTim').style.width = vel.tim+'%';
+    document.getElementById('vAmtV').textContent = vel.amt.toFixed(0)+'%';
+    document.getElementById('vMerV').textContent = vel.mer.toFixed(0)+'%';
+    document.getElementById('vLocV').textContent = vel.loc.toFixed(0)+'%';
+    document.getElementById('vTimV').textContent = vel.tim.toFixed(0)+'%';
+
+    // Indicators
+    const indList = document.getElementById('indList');
+    indList.innerHTML = d.flags.map(f=>`
+      <div class="ind-item"><span class="ind-dot"></span><span>${f}</span></div>
+    `).join('');
+
+    // Model badge
+    document.getElementById('modelBadge').textContent = d.model_used || 'RandomForest';
+
+    // History
+    const now = new Date();
+    const ts = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    history.push({ time:ts, amount, prob:p, flagged, merchant:mLabel });
+    probs.push(p);
+
+    // Recent checks table
+    const tbody = document.getElementById('recentTbl');
+    const rows = history.slice().reverse().slice(0,10);
+    tbody.innerHTML = rows.map(r=>`
+      <tr>
+        <td>${r.time}</td>
+        <td class="amt">$${parseFloat(r.amount).toFixed(2)}</td>
+        <td style="font-size:10px;color:var(--muted)">${r.merchant.split('/')[0].trim()}</td>
+        <td><span class="rbadge ${r.flagged?'f':'c'}">${r.flagged?'FLAGGED':'CLEARED'}</span></td>
+        <td class="${r.flagged?'pf':'pc'}">${r.prob}%</td>
+      </tr>
+    `).join('');
+
+    // Session counters
+    document.getElementById('totalRun').textContent  = history.length;
+    document.getElementById('totalFlag').textContent = history.filter(x=>x.flagged).length;
+
+    // Session metrics
+    const avg = probs.reduce((a,b)=>a+b,0)/probs.length;
+    const maxP = Math.max(...probs);
+    const minP = Math.min(...probs);
+    const flagRate = history.filter(x=>x.flagged).length/history.length*100;
+    document.getElementById('avgProb').textContent  = avg.toFixed(1)+'%';
+    document.getElementById('flagRate').textContent = flagRate.toFixed(0)+'%';
+    document.getElementById('maxProb').textContent  = maxP+'%';
+    document.getElementById('minProb').textContent  = minP+'%';
+    document.getElementById('msAvg').textContent    = avg.toFixed(1)+'%';
+    document.getElementById('msFlagRate').textContent = flagRate.toFixed(0)+'%';
+    document.getElementById('msMax').textContent    = maxP+'%';
+    document.getElementById('msMin').textContent    = minP+'%';
+
+    // Score bands
+    const bands = {low:0, med:0, high:0, crit:0};
+    probs.forEach(pp=>{ if(pp<20) bands.low++; else if(pp<50) bands.med++; else if(pp<75) bands.high++; else bands.crit++; });
+    const tot = probs.length;
+    ['Low','Med','High','Crit'].forEach(b=>{
+      const k = b.toLowerCase();
+      document.getElementById('band'+b+'N').textContent = bands[k]||0;
+      document.getElementById('band'+b+'B').style.width = tot?(bands[k]/tot*100)+'%':'0%';
+    });
+
+    // Charts
+    drawHistory();
+    drawDist();
+
+  } catch(e){
+    alert('Request failed: '+e.message);
+  } finally {
+    btn.textContent = 'Run Risk Check';
+    btn.disabled = false;
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+buildHeatMap();
+drawRadar([0.05,0.05,0.05,0.05]);
+window.addEventListener('resize', ()=>{ drawHistory(); drawDist(); });
+</script>
+</body>
+</html>
