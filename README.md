@@ -1,8 +1,10 @@
 #  Real Time Fraud Prevention — Credit Card Fraud Detection Web App
 
 A clean, locally-hosted Flask web app that lets you simulate real-time credit card transaction screening using your trained Random Forest model.
-<img width="1918" height="896" alt="image" src="https://github.com/user-attachments/assets/cd88a7c3-b1e8-4de0-88b0-7a16156b5f84" />
-<img width="1731" height="896" alt="image" src="https://github.com/user-attachments/assets/e84d131c-b622-4c60-949f-d4d5d7828712" />
+<img width="1911" height="1011" alt="image" src="https://github.com/user-attachments/assets/e4355922-1026-4555-a49e-c479a340b38d" />
+<img width="1912" height="1002" alt="image" src="https://github.com/user-attachments/assets/57112900-7258-48aa-ba37-f1354bf1b0aa" />
+<img width="1914" height="901" alt="image" src="https://github.com/user-attachments/assets/6089840f-0b15-4909-a634-1207009cb092" />
+
 
 ---
 
